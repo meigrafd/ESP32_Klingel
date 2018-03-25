@@ -1,0 +1,42 @@
+﻿# Download https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/raw/master/MicroPython_BUILD/firmware/MicroPython_LoBo_esp32_all.zip
+#
+# follow the instructions: https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/wiki/build
+#
+apt-get install git-core wget make libncurses-dev flex bison gperf python python-serial python3-pip
+git clone https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo.git
+cd MicroPython_ESP32_psRAM_LoBo/MicroPython_BUILD
+wget https://raw.githubusercontent.com/loboris/MicroPython_ESP32_psRAM_LoBo/master/MicroPython_BUILD/firmware/esp32_psram_all/sdkconfig
+./BUILD.sh menuconfig
+# navigate to 
+# → Component configmbedTLS
+# and set... TLS maximum message content length → 16384
+./BUILD.sh && ./BUILD.sh erase && ./BUILD.sh flash && ./BUILD.sh monitor
+
+
+pip3 install rshell
+rshell -p /dev/ttyUSB0
+
+
+# execute in rshell:
+cp /path/to/boot.py /flash/
+# /path/to/boot.py is local one
+# after that:
+#   format sd-card with fat32, copy files out 'sd' directory to it.
+#   insert sd-card into esp module.
+# enter 'repl' and hit Control-D
+
+# execute on esp32:
+import upip
+upip.install('picoweb')
+upip.install('utemplate')
+
+upip.install('micropython-uasyncio')
+upip.install('micropython-uasyncio.queues')
+upip.install('micropython-uasyncio.synchro')
+upip.install('micropython-pkg_resources')
+upip.install('micropython-logging')
+
+upip.install('micropython-urequests')
+upip.install('micropython-warnings')
+upip.install("micropython-socket")
+

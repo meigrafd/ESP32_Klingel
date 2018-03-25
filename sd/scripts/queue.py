@@ -7,25 +7,11 @@
 # from queue import Queue, QueueEmpty, QueueFull
 # queue = Queue()
 # try:
-#   queue.get(timeout=10)
+#   queue.get(timeout=20)
 # except QueueEmpty:
 #   pass
 #
-from utime import time, sleep
-
-
-# prevent 'Task watchdog interrupt'
-def _msleep(msec):
-    if msec < 0:
-        raise ValueError("'msec' must be a non-negative number")
-    interval = int(msec/1000)
-    start_time = time()
-    while True:
-        dummy=False
-        if (time() - start_time) >= interval:
-            break
-        sleep(0.01)
-        dummy=True
+from utime import time, sleep_ms
 
 
 class deque:
@@ -96,7 +82,7 @@ class Queue:
                     raise QueueFull
             elif timeout is None:
                 while self.qsize() >= self.maxsize:
-                    _msleep(100)
+                    sleep_ms(100)
             elif timeout < 0:
                 raise ValueError("'timeout' must be a non-negative number")
             else:
@@ -105,7 +91,7 @@ class Queue:
                     remaining = endtime - time()
                     if remaining <= 0.0:
                         raise QueueFull
-                    _msleep(100)
+                    sleep_ms(100)
         self._put(item)
     
     def _get(self):
@@ -117,7 +103,7 @@ class Queue:
                 raise QueueEmpty
         elif timeout is None:
             while not self.qsize():
-                _msleep(100)
+                sleep_ms(100)
         elif timeout < 0:
             raise ValueError("'timeout' must be a non-negative number")
         else:
@@ -126,7 +112,7 @@ class Queue:
                 remaining = endtime - time()
                 if remaining <= 0.0:
                     raise QueueEmpty
-                _msleep(100)
+                sleep_ms(100)
         return self._get()
     
     def get_nowait(self):

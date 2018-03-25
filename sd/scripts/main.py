@@ -12,8 +12,8 @@ micropython.alloc_emergency_exception_buf(100)
 
 # custom
 import oled
+import queues
 import settings
-from queue import Queue
 from wlan_manager import wifi
 from utils import *
 
@@ -21,6 +21,7 @@ from utils import *
 ## https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/tree/master/MicroPython_BUILD/components/micropython/esp32/modules
 ## https://github.com/peterhinch/micropython-async/blob/master/TUTORIAL.md#71-why-scheduling
 ## https://github.com/micropython/micropython/tree/master/ports/esp32/modules
+## https://github.com/peterhinch/Micropython-scheduler
 
 
 def printD(message, end='\n'):
@@ -85,7 +86,7 @@ network.telnet.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, time
 def interrupt_event(q, r, channel):
     q.put((r.now(), channel))
 
-queue = Queue()
+queue = queues.Queue()
 pin_isr = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)
 pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_event, queue, rtc))
 
@@ -93,12 +94,12 @@ pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_event, que
 # webserver
 
 # for test purpose....
-sys.exit(0)
+#sys.exit(0)
 
 
 import telegram
 telegram_bot = telegram.bot(settings.TOKEN, settings.CHAT_ID)
-telegram_bot.send("Ding Dong!")
+#telegram_bot.send("Ding Dong!")
 
 cleared=False
 while True:
@@ -115,7 +116,7 @@ while True:
         cleared=False
         #telegram_bot.send("Ding Dong!")
         #blue_led.toggle()
-        utime.sleep(2)
+        #utime.sleep(2)
         #blue_led.toggle()
 
 

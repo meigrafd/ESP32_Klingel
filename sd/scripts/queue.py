@@ -2,9 +2,19 @@
 #
 # own creation (25.03.2018 by meigrafd)
 #
+# Example Usage:
+#
+# from queue import Queue, QueueEmpty, QueueFull
+# queue = Queue()
+# try:
+#   queue.get(timeout=10)
+# except QueueEmpty:
+#   pass
+#
 from utime import time, sleep
 
 
+# prevent 'Task watchdog interrupt'
 def _msleep(msec):
     if msec < 0:
         raise ValueError("'msec' must be a non-negative number")
@@ -24,43 +34,43 @@ class deque:
             self.q = []
         else:
             self.q = list(iterable)
-
+    
     def popleft(self):
         return self.q.pop(0)
-
+    
     def popright(self):
         return self.q.pop()
-
+    
     def pop(self):
         return self.q.pop()
-
+    
     def append(self, a):
         self.q.append(a)
-
+    
     def appendleft(self, a):
         self.q.insert(0, a)
-
+    
     def extend(self, a):
         self.q.extend(a)
-
+    
     def __len__(self):
         return len(self.q)
-
+    
     def __bool__(self):
         return bool(self.q)
-
+    
     def __iter__(self):
         yield from self.q
-
+    
     def __str__(self):
         return 'deque({})'.format(self.q)
 
 
-class Empty(Exception):
+class QueueEmpty(Exception):
     'Exception raised by Queue.get(block=0)/get_nowait().'
     pass
 
-class Full(Exception):
+class QueueFull(Exception):
     'Exception raised by Queue.put(block=0)/put_nowait().'
     pass
 
@@ -83,7 +93,7 @@ class Queue:
         if self.maxsize > 0:
             if not block:
                 if self.qsize() >= self.maxsize:
-                    raise Full
+                    raise QueueFull
             elif timeout is None:
                 while self.qsize() >= self.maxsize:
                     _msleep(100)
@@ -94,7 +104,7 @@ class Queue:
                 while self.qsize() >= self.maxsize:
                     remaining = endtime - time()
                     if remaining <= 0.0:
-                        raise Full
+                        raise QueueFull
                     _msleep(100)
         self._put(item)
     
@@ -104,7 +114,7 @@ class Queue:
     def get(self, block=True, timeout=None):
         if not block:
             if not self.qsize():
-                raise Empty
+                raise QueueEmpty
         elif timeout is None:
             while not self.qsize():
                 _msleep(100)
@@ -115,7 +125,7 @@ class Queue:
             while not self.qsize():
                 remaining = endtime - time()
                 if remaining <= 0.0:
-                    raise Empty
+                    raise QueueEmpty
                 _msleep(100)
         return self._get()
     

@@ -12,8 +12,8 @@ micropython.alloc_emergency_exception_buf(100)
 
 # custom
 import oled
-import queues
 import settings
+from queue import Queue, QueueEmpty, QueueFull
 from wlan_manager import wifi
 from utils import *
 
@@ -86,9 +86,9 @@ network.telnet.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, time
 def interrupt_event(q, r, channel):
     q.put((r.now(), channel))
 
-queue = queues.Queue()
+queue = Queue()
 pin_isr = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)
-pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_event, queue, rtc))
+cb_obj = pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_event, queue, rtc))
 
 
 # webserver
@@ -103,16 +103,16 @@ telegram_bot = telegram.bot(settings.TOKEN, settings.CHAT_ID)
 
 cleared=False
 while True:
-    utime.sleep(0.1)
+    utime.sleep(0.2)
     # reduce power consumption
     machine.idle()
     if not cleared:
         oled.oclear()
         cleared=True
     if not queue.empty():
-        start_time, pin = queue.get()
-        printD('pin change {}'.format(pin))
-        oled.otext('pin change {}'.format(pin), 15, 35)
+        _time, pin = queue.get()
+        printD('{0} pin change {1}'.format(utime.strftime("%c", _time), pin))
+        oled.otext('{0} pin chang'.format(utime.strftime("%H:%M:%S", _time), 0, 35)
         cleared=False
         #telegram_bot.send("Ding Dong!")
         #blue_led.toggle()

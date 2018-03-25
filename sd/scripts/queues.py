@@ -2,7 +2,6 @@
 #
 # own creation (25.03.2018 by meigrafd)
 #
-import machine
 from utime import time, sleep
 
 

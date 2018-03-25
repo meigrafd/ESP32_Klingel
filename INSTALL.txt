@@ -28,5 +28,5 @@ cp /path/to/boot.py /flash/
 # execute on esp32:
 import upip
 
-upip.install('micropython-urequests')
+upip.install('micropython-uasyncio')
 

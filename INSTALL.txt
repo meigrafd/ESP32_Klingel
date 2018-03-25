@@ -8,7 +8,7 @@ cd MicroPython_ESP32_psRAM_LoBo/MicroPython_BUILD
 wget https://raw.githubusercontent.com/loboris/MicroPython_ESP32_psRAM_LoBo/master/MicroPython_BUILD/firmware/esp32_psram_all/sdkconfig
 ./BUILD.sh menuconfig
 # navigate to 
-# → Component configmbedTLS
+# → Component config → mbedTLS
 # and set... TLS maximum message content length → 16384
 ./BUILD.sh && ./BUILD.sh erase && ./BUILD.sh flash && ./BUILD.sh monitor
 

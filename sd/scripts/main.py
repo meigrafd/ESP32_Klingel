@@ -112,8 +112,8 @@ def loop():
             cleared=True
         if not queue.empty():
             _time, pin = queue.get()
-            printD('{0} pin change {1}'.format(utime.strftime("%c", _time), pin))
-            oled.otext('{0} pin chang'.format(utime.strftime("%H:%M:%S", _time), 0, 35))
+            print('{0} pin change {1}'.format(utime.strftime("%c", _time), pin))
+            oled.otext('{0} pin chang'.format(utime.strftime("%H:%M:%S", _time)), 0, 35)
             cleared=False
             #telegram_bot.send("Ding Dong!")
             #blue_led.toggle()

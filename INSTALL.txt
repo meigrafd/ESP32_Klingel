@@ -1,4 +1,4 @@
-﻿# Download https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/raw/master/MicroPython_BUILD/firmware/MicroPython_LoBo_esp32_all.zip
+# Download https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/raw/master/MicroPython_BUILD/firmware/MicroPython_LoBo_esp32_all.zip
 #
 # follow the instructions: https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/wiki/build
 #
@@ -27,16 +27,6 @@ cp /path/to/boot.py /flash/
 
 # execute on esp32:
 import upip
-upip.install('picoweb')
-upip.install('utemplate')
-
-upip.install('micropython-uasyncio')
-upip.install('micropython-uasyncio.queues')
-upip.install('micropython-uasyncio.synchro')
-upip.install('micropython-pkg_resources')
-upip.install('micropython-logging')
 
 upip.install('micropython-urequests')
-upip.install('micropython-warnings')
-upip.install("micropython-socket")
 

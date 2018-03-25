@@ -5,12 +5,15 @@ import uos
 import utime
 import machine
 import network
-#import micropython
+
+#for debugging:
+import micropython
+micropython.alloc_emergency_exception_buf(100)
 
 # custom
 import oled
-import queues
 import settings
+from queue import Queue
 from wlan_manager import wifi
 from utils import *
 
@@ -82,7 +85,7 @@ network.telnet.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, time
 def interrupt_event(q, r, channel):
     q.put((r.now(), channel))
 
-queue = queues.Queue()
+queue = Queue()
 pin_isr = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)
 pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_event, queue, rtc))
 

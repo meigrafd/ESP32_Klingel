@@ -17,6 +17,12 @@ class OLED:
             self.display.fill(0)
             self.display.rotate(True)
     
+    def on(self):
+        self.display.poweron()
+    
+    def off(self):
+        self.display.poweroff()
+    
     def oprint(self, x, y):
         self.display.pixel(x, y, 1)
         self.display.show()

@@ -84,7 +84,7 @@ network.telnet.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, time
 def interrupt_event(arg):
     q, r, pin = arg
     q.put((r.now(), pin))
-    print('{} pin change {}'.format(utime.strftime("%M:%S", r.now()), pin))
+    #print('{} pin change {}'.format(utime.strftime("%M:%S", r.now()), pin))
 
 queue = Queue()
 interrupt_pin = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)

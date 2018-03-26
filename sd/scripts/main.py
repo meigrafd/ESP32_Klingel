@@ -6,22 +6,24 @@ import utime
 import machine
 import network
 
-#for debugging:
+#for debugging interrupt service routines:
 import micropython
 micropython.alloc_emergency_exception_buf(100)
 
 # custom
-import oled
 import settings
+import telegram
+from oled import OLED
 from queue import Queue, QueueEmpty, QueueFull
+from irq_debounce import DebouncedSwitch
 from wlan_manager import wifi
 from utils import *
 
 
 ## https://github.com/loboris/MicroPython_ESP32_psRAM_LoBo/tree/master/MicroPython_BUILD/components/micropython/esp32/modules
 ## https://github.com/peterhinch/micropython-async/blob/master/TUTORIAL.md#71-why-scheduling
-## https://github.com/micropython/micropython/tree/master/ports/esp32/modules
 ## https://github.com/peterhinch/Micropython-scheduler
+## https://github.com/micropython/micropython/tree/master/ports/esp32/modules
 
 
 def printD(message, end='\n'):
@@ -34,8 +36,8 @@ def printD(message, end='\n'):
 
 
 # ----- OLED
-oled.init()
-oled.owelcome()
+oled = OLED()
+oled.welcome()
 
 
 wlan = wifi(settings.WLAN_SSID, settings.WLAN_PASSWD, settings.DEBUG)
@@ -45,13 +47,13 @@ wlan.static_network(ip='192.168.0.111', gateway='192.168.0.1')
 
 if not wlan.do_connect():
     printD("Could not initialize the network connection.")
-    oled.oclear()
-    oled.otext("Could not initialize network.", 0, 5)
+    oled.clear()
+    oled.text("Could not initialize network.", 0, 5)
     wlan.access_point(password=settings.WLAN_AP_PASS, authmode=3)
 
-oled.oclear()
-oled.otext("WLAN IP", 0, 5)
-oled.otext(str(wlan.ipadd), 0, 15)
+oled.clear()
+oled.text("WLAN IP", 0, 5)
+oled.text(str(wlan.ipadd), 0, 15)
 
 # There's currently no timezone support in MicroPython, so
 # utime.localtime() will return UTC time (as if it was .gmtime())
@@ -60,7 +62,7 @@ rtc_timeout=10
 rtc = machine.RTC()
 rtc.ntp_sync(server=settings.ntpserver, tz=settings.tz)
 while not rtc.synced():
-    utime.sleep(1)
+    utime.sleep_ms(1000)
     rtc_timeout -= 1
     if rtc_timeout == 5:
         rtc.ntp_sync(server=settings.ntpserver2, tz="UTC-1")
@@ -83,12 +85,14 @@ network.ftp.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, buffsiz
 network.telnet.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, timeout=300)
 
 
-def interrupt_event(q, r, channel):
-    q.put((r.now(), channel))
+def interrupt_event(arg):
+    q, r, pin = arg
+    q.put((r.now(), pin))
+    print('{} pin change {}'.format(utime.strftime("%M:%S", r.now()), pin))
 
 queue = Queue()
-pin_isr = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)
-cb_obj = pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_event, queue, rtc))
+interrupt_pin = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)
+doorbellbutton = DebouncedSwitch(sw=interrupt_pin, cb=interrupt_event, arg=(queue, rtc, settings.isr), delay=500)
 
 
 # webserver
@@ -97,23 +101,32 @@ cb_obj = pin_isr.irq(trigger=machine.Pin.IRQ_RISING, handler=partial(interrupt_e
 #sys.exit(0)
 
 
-import telegram
 telegram_bot = telegram.bot(settings.TOKEN, settings.CHAT_ID)
 #telegram_bot.send("Ding Dong!")
 
+
 def loop():
+    while True:
+        _time, pin = queue.get()  # block till entry
+        print("debug: {}".format(queue.qsize()))
+        print('{0} pin change {1}'.format(utime.strftime("%H:%M:%S", _time), pin))
+
+
+def loop2():
     cleared=False
     while True:
-        utime.sleep(0.2)
+        gc.collect()
+        utime.sleep_ms(100)
         # reduce power consumption
         machine.idle()
         if not cleared:
-            oled.oclear()
+            oled.clear()
             cleared=True
         if not queue.empty():
+            print("debug: {}".format(queue.qsize()))
             _time, pin = queue.get()
-            print('{0} pin change {1}'.format(utime.strftime("%c", _time), pin))
-            oled.otext('{0} pin chang'.format(utime.strftime("%H:%M:%S", _time)), 0, 35)
+            print('{0} pin change {1}'.format(utime.strftime("%H:%M:%S", _time), pin))
+            oled.text('{0} pin change'.format(utime.strftime("%H:%M:%S", _time)), 0, 35)
             cleared=False
             #telegram_bot.send("Ding Dong!")
             #blue_led.toggle()

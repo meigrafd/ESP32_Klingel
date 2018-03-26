@@ -7,8 +7,8 @@ import machine
 import network
 
 #for debugging interrupt service routines:
-import micropython
-micropython.alloc_emergency_exception_buf(100)
+#import micropython
+#micropython.alloc_emergency_exception_buf(100)
 
 # custom
 import settings
@@ -29,10 +29,6 @@ from utils import *
 def printD(message, end='\n'):
     if settings.DEBUG:
         print(message, end=end)
-
-# turn off GPIO2 (blue onboard led)
-#blue_led = machine.Pin(2, machine.Pin.OUT)
-#blue_led.value(0)
 
 
 # ----- OLED
@@ -107,8 +103,9 @@ telegram_bot = telegram.bot(settings.TOKEN, settings.CHAT_ID)
 
 def loop():
     while True:
+        machine.idle()  # reduce power consumption
         _time, pin = queue.get()  # block till entry
-        print("debug: {}".format(queue.qsize()))
+        print("queue.qsize(): {}".format(queue.qsize()))
         print('{0} pin change {1}'.format(utime.strftime("%H:%M:%S", _time), pin))
 
 

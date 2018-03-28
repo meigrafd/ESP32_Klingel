@@ -11,11 +11,11 @@ import network
 
 
 class wifi:
-    def __init__(self, ssid=None, password=None, debug=True):
+    def __init__(self, ssid=None, password=None, debug=True, timeout=12):
         self.ssid = ssid
         self.password = password
         self.debug = debug
-        self.timeout = 12 #sec
+        self.timeout = timeout #sec
         self.sta = network.WLAN(network.STA_IF)
         self.ap = network.WLAN(network.AP_IF)
         self.ap_active = self.ap.active(False)
@@ -57,14 +57,13 @@ class wifi:
             return True
         timeout = self.timeout
         if not ssid: ssid = self.ssid
-        if not password: password = self.password
         if not self.sta.active(): self.sta.active(True)
         self.printD('Connecting.', end='')
         self.sta.connect(ssid, password)
         while not self.sta.isconnected() and timeout > 0:
             self.printD('.', end='')
             timeout -= 1
-            utime.sleep(1)
+            utime.sleep_ms(1000)
         if self.sta.isconnected():
             self.ipadd = self.sta.ifconfig()[0]
             self.printD(' wlan-client connection as {}'.format(self.ipadd))
@@ -76,10 +75,10 @@ class wifi:
         return False
     
     def static_network(self, ip, subnet='255.255.255.0', gateway='192.168.0.1', dns='208.67.220.220'):
-        # go for fixed IP settings
         self.sta.ifconfig((ip, subnet, gateway, dns))
     
     def access_point(self, ssid=None, password=None, authmode=0):
+        if self.sta.active(): self.sta.active(False)
         self.ap.active(True)
         if not ssid:
             ssid = 'ESP-'+str(self.ap.config('mac')[4])+str(self.ap.config('mac')[5])

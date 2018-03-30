@@ -1,5 +1,5 @@
 import ujson as json
-import urequests
+import requests
 
 ## https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/apihelper.py
 
@@ -14,7 +14,7 @@ class bot:
         self.READ_TIMEOUT = 9999
     
     def get_url(self, url):
-        response = urequests.request('GET', url)
+        response = requests.request('GET', url)
         content = response.content.decode('utf8')
         return content
     
@@ -42,9 +42,10 @@ class bot:
         self.send_message(text, self.chat_id)
     
     def send_message(self, text, chat_id):
+        text = requests.quote_plus(text)
         method = 'sendMessage?parse_mode=Markdown&chat_id={0}&text={1}'.format(chat_id, text)
         request_url = self.base_url.format(self.token, method)
-        response = urequests.request('GET', request_url)
+        response = requests.request('GET', request_url)
 
 
 class ApiException(Exception):

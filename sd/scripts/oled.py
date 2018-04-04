@@ -40,5 +40,9 @@ class OLED:
         self.text('----------------', 0, 0)
         self.text('e-Bell', 30, 13)
         self.text('----------------', 0, 28)
+    
+    def scroll(self, indent, line):
+        self.display.scroll(indent, line)
+        self.display.show()
 
 # EOF

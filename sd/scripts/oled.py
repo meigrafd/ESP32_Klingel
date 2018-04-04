@@ -1,6 +1,5 @@
 import sh1106
 import settings
-import network
 import machine
 
 

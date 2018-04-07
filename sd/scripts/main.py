@@ -6,10 +6,6 @@ import utime
 import machine
 import network
 
-#for debugging interrupt service routines:
-#import micropython
-#micropython.alloc_emergency_exception_buf(100)
-
 # custom
 import settings
 import telegram

@@ -26,8 +26,8 @@ class wifi:
             print(message, end=end)
     
     def scan(self, ssid=None, password=None):
-        if ssid not None: self.ssid = ssid
-        if password not None: self.password = password
+        if ssid is not None: self.ssid = ssid
+        if password is not None: self.password = password
         self.sta.active(True)
         self.networks = self.sta.scan()
         for ssid, bssid, channel, rssi, authmode, hidden in sorted(self.networks, key=lambda x: x[3], reverse=True):

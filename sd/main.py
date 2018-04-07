@@ -27,7 +27,6 @@ def printD(message, end='\n'):
         print(message, end=end)
 
 
-# ----- OLED
 oled = OLED()
 oled.welcome()
 
@@ -95,12 +94,6 @@ _left = machine.Pin(39, machine.Pin.IN)
 #_right.irq(trigger=machine.Pin.IRQ_RISING, handler=nav_)
 #_click.irq(trigger=machine.Pin.IRQ_RISING, handler=nav_)
 #_left.irq(trigger=machine.Pin.IRQ_RISING, handler=nav_)
-
-
-# webserver
-
-# for test purpose....
-#sys.exit(0)
 
 
 telegram_bot = telegram.bot(settings.TOKEN, settings.CHAT_ID)

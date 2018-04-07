@@ -1,4 +1,4 @@
-## /sd/scripts/main.py
+## /sd/main.py
 import gc
 import sys
 import uos

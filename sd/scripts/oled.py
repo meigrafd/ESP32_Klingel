@@ -1,6 +1,10 @@
 import machine
 import sh1106
 import settings
+<<<<<<< HEAD
+=======
+import machine
+>>>>>>> a4581ce4efe2009fd2422d494e5965d67d96dc02
 
 
 class OLED:

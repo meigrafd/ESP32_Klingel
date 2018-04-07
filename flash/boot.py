@@ -18,5 +18,5 @@ MISO = machine.Pin(const(2))
 uos.sdconfig(uos.SDMODE_SPI, SCK, MOSI, MISO, CS)
 uos.mountsd()
 
-if 'main.py' in uos.listdir('/sd/scripts'):
-    exec(open('/sd/scripts/main.py').read(), globals())
+if 'main.py' in uos.listdir('/sd'):
+    exec(open('/sd/main.py').read(), globals())

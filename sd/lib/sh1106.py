@@ -97,11 +97,13 @@ class SH1106:
         fb = framebuf.FrameBuffer(self.buffer, self.width, self.height, framebuf.MVLSB)
         self.framebuf = fb
         # set shortcuts for the methods of framebuf
+        # http://docs.micropython.org/en/latest/esp8266/library/framebuf.html#module-framebuf
         self.fill = fb.fill
         self.fill_rect = fb.fill_rect
         self.hline = fb.hline
         self.vline = fb.vline
         self.line = fb.line
+        self.rect = fb.rect
         self.pixel = fb.pixel
         self.scroll = fb.scroll
         self.text = fb.text

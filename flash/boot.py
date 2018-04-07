@@ -1,4 +1,4 @@
-﻿## /flash/boot.py
+## /flash/boot.py
 # This file is executed on every boot (including wake-boot from deepsleep)
 from micropython import const
 import machine
@@ -7,7 +7,7 @@ import sys
 
 
 sys.path[1] = '/sd/lib'
-sys.path.append('/sd/scripts')
+sys.path.append('/sd')
 sys.path.append('/flash/lib')
 
 CS = machine.Pin(const(13))

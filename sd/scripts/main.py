@@ -36,12 +36,9 @@ oled = OLED()
 oled.welcome()
 
 
-wlan = wifi(settings.WLAN_SSID, settings.WLAN_PASSWD, settings.DEBUG)
-# go for fixed IP settings (IP, Subnet, Gateway, DNS)
-#wlan.sta.ifconfig(('192.168.0.111', '255.255.255.0', '192.168.0.1', '192.168.0.1'))
+wlan = wifi(debug=settings.DEBUG)
 wlan.static_network(ip='192.168.0.111', gateway='192.168.0.1')
-
-if not wlan.do_connect():
+if not wlan.do_connect(settings.WLAN_SSID, settings.WLAN_PASSWD):
     printD("Could not initialize the network connection.")
     oled.clear()
     oled.text("Could not initialize network.", 0, 5)
@@ -75,7 +72,7 @@ _ = mdns.addService('_ftp', '_tcp', 21, "MicroPython", {"board": "ESP32", "servi
 _ = mdns.addService('_telnet', '_tcp', 23, "MicroPython", {"board": "ESP32", "service": "mPy Telnet REPL"})
 _ = mdns.addService('_http', '_tcp', 80, "MicroPython", {"board": "ESP32", "service": "mPy Web server"})
 
-
+utime.sleep_ms(1000)
 # FTP & Telnet Server
 network.ftp.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, buffsize=1024, timeout=300)
 network.telnet.start(user=settings.FTP_LOGIN, password=settings.FTP_PASSWD, timeout=300)
@@ -89,6 +86,19 @@ def interrupt_event(arg):
 queue = Queue()
 interrupt_pin = machine.Pin(settings.isr, machine.Pin.IN, machine.Pin.PULL_UP)
 doorbellbutton = DebouncedSwitch(sw=interrupt_pin, cb=interrupt_event, arg=(queue, rtc, settings.isr), delay=500)
+
+
+# Navigation button
+def nav_(p):
+    print(p)
+
+_right = machine.Pin(34, machine.Pin.IN)
+_click = machine.Pin(35, machine.Pin.IN)
+_left = machine.Pin(39, machine.Pin.IN)
+
+#_right.irq(trigger=machine.Pin.IRQ_RISING, handler=nav_)
+#_click.irq(trigger=machine.Pin.IRQ_RISING, handler=nav_)
+#_left.irq(trigger=machine.Pin.IRQ_RISING, handler=nav_)
 
 
 # webserver

@@ -25,7 +25,9 @@ class wifi:
         if self.debug:
             print(message, end=end)
     
-    def scan(self):
+    def scan(self, ssid=None, password=None):
+        if ssid not None: self.ssid = ssid
+        if password not None: self.password = password
         self.sta.active(True)
         self.networks = self.sta.scan()
         for ssid, bssid, channel, rssi, authmode, hidden in sorted(self.networks, key=lambda x: x[3], reverse=True):
@@ -56,9 +58,8 @@ class wifi:
             self.printD('Already connected!')
             return True
         timeout = self.timeout
-        if not ssid: ssid = self.ssid
         if not self.sta.active(): self.sta.active(True)
-        self.printD('Connecting.', end='')
+        self.printD('WLAN: Connecting.', end='')
         self.sta.connect(ssid, password)
         while not self.sta.isconnected() and timeout > 0:
             self.printD('.', end='')
@@ -66,7 +67,7 @@ class wifi:
             utime.sleep_ms(1000)
         if self.sta.isconnected():
             self.ipadd = self.sta.ifconfig()[0]
-            self.printD(' wlan-client connection as {}'.format(self.ipadd))
+            self.printD(' client connection as {}'.format(self.ipadd))
             return True
         else:
             self.sta.disconnect()
@@ -84,7 +85,7 @@ class wifi:
             ssid = 'ESP-'+str(self.ap.config('mac')[4])+str(self.ap.config('mac')[5])
         self.ssid = ssid
         self.ap.config(essid=ssid, password=password, authmode=authmode)
-        print('Own AP: "{0}" pw: "{1}"' . format(self.ap.config('essid'), password))
+        print('Own WLAN-AP: "{0}" pw: "{1}"' . format(self.ap.config('essid'), password))
         self.ap_active = True
         self.ipadd = '0.0.0.0'
 
